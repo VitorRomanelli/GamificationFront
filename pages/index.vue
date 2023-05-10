@@ -48,7 +48,13 @@
       <br />
       <br />
 
-      <v-btn class="btn-1" block x-large @click="login">
+      <v-btn
+        class="btn-1"
+        block
+        x-large
+        :loading="$nuxt.$loading ? $nuxt.$loading.loading : false"
+        @click="login"
+      >
         Log in
         <v-spacer></v-spacer>
         <v-icon>mdi-chevron-right</v-icon>

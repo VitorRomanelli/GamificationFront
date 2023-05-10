@@ -184,14 +184,14 @@ export default {
     const payload = this.$convertToQueryString(this.filter);
 
     this.$axios.$get(`user/metrics?${payload}`).then(response => {
-      this.total = response.content.total;
-      this.active = response.content.active;
-      this.inactive = response.content.inactive;
+      this.total = response.total;
+      this.active = response.active;
+      this.inactive = response.inactive;
     })
 
     this.$axios.$get(`user/list/paginate?${payload}`).then(response => {
-      this.items = response.content.data
-      this.pager = response.content.pager
+      this.items = response.data
+      this.pager = response.pager
     })
   },
 

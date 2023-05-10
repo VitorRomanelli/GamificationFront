@@ -1,5 +1,13 @@
 <template>
   <div>
+    <v-dialog v-model="updateDialog" max-width="500">
+      <OrdersStatusUpdate
+        :data="updatePayload"
+        @close="updateDialog = false"
+        @updated="update"
+      />
+    </v-dialog>
+
     <v-dialog v-model="removeDialog" max-width="500">
       <OrdersRemove
         :data="order"
@@ -21,7 +29,7 @@
       </v-col>
     </Header>
 
-    <div class="d-flex px-3">
+    <div v-if="user.type < 2" class="d-flex px-3">
       <v-btn
         width="49%"
         class="card"
@@ -67,15 +75,28 @@
               ></v-progress-circular>
             </div>
 
-            <div style="width: 100%">
-              <div class="d-flex">
-                <div>
-                  <h1 class="t4 mr-2">{{ ord.title }}</h1>
-                  <span class="bold mr-2">ID: {{ ord.id }}</span>
+            <div style="width: 100%" class="d-flex flex-wrap">
+              <div>
+                <div class="d-flex">
+                  <div>
+                    <h1 class="t4 mr-2">{{ ord.title }}</h1>
+                    <span class="bold mr-2">ID: {{ ord.id }}</span>
+                  </div>
                 </div>
-
-                <v-spacer></v-spacer>
-                <v-menu offset-y open-on-hover>
+                <div>
+                  <v-subheader class="pl-0 my-3 my-sm-0">
+                    {{ ord.description }}
+                  </v-subheader>
+                  <div>
+                    <v-chip color="secondary white--text" class="bold" label>
+                      {{ ord.sector ? ord.sector.name : 'Sem registro' }}
+                    </v-chip>
+                  </div>
+                </div>
+              </div>
+              <v-spacer></v-spacer>
+              <div class="d-flex flex-column align-end">
+                <v-menu v-if="user.type == 0" offset-y open-on-hover>
                   <template #activator="{ on, attrs }">
                     <v-btn icon v-bind="attrs" v-on="on">
                       <v-icon>mdi-dots-vertical</v-icon>
@@ -92,28 +113,63 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-              </div>
-              <div>
-                <v-subheader class="pl-0">
-                  {{ ord.description }}
-                </v-subheader>
-                <div class="d-flex flex-wrap">
-                  <v-chip color="secondary white--text" class="bold" label>
-                    {{ ord.sector ? ord.sector.name : 'Sem registro' }}
-                  </v-chip>
-                  <v-spacer></v-spacer>
-                  <div class="d-flex justify-end align-end mt-2">
-                    <v-chip :color="getColor(ord.step * 50)" outlined>{{
-                      ord.stepString
-                    }}</v-chip>
-                    <span
-                      class="t4 accent--text ml-4"
-                      style="line-height: unset"
-                    >
-                      {{ ord.rewardPoints }}
-                    </span>
-                    <span class="bold">pts</span>
-                  </div>
+                <v-spacer></v-spacer>
+                <v-btn
+                  v-if="ord.step < 2"
+                  color="success"
+                  depressed
+                  @click="openUpdate(ord, ord.step + 1)"
+                >
+                  Avançar status
+                </v-btn>
+                <v-spacer></v-spacer>
+                <div class="d-flex justify-end align-end mt-2">
+                  <v-menu open-on-hover offset-y>
+                    <template #activator="{ on, attrs }">
+                      <v-chip
+                        outlined
+                        :color="getColor(ord.step * 50)"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ ord.stepString }}
+                      </v-chip>
+                    </template>
+
+                    <v-list nav dense>
+                      <div
+                        v-for="(step, i) in [
+                          'Agendado',
+                          'Em progresso',
+                          'Feito',
+                        ]"
+                        :key="step"
+                      >
+                        <v-list-item
+                          v-if="i > ord.step"
+                          link
+                          :class="`bold d-flex justify-center ${getColor(
+                            i * 50
+                          )}--text`"
+                          @click="openUpdate(ord, i)"
+                        >
+                          {{ step }}
+                        </v-list-item>
+                      </div>
+
+                      <v-list-item
+                        v-if="ord.step == 2"
+                        :class="`bold d-flex justify-center`"
+                      >
+                        Serviço concluído
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+
+                  <span class="t4 accent--text ml-4" style="line-height: unset">
+                    {{ ord.rewardPoints }}
+                  </span>
+                  <span class="bold">pts</span>
                 </div>
               </div>
             </div>
@@ -131,7 +187,7 @@
             color="white"
             icon
             :disabled="pager.currentPage == 1"
-            @click="page--"
+            @click="filter.page--"
           >
             <v-icon size="20">mdi-chevron-left</v-icon>
           </v-btn>
@@ -139,7 +195,7 @@
             color="white"
             icon
             :disabled="pager.currentPage == pager.totalPages"
-            @click="page++"
+            @click="filter.page++"
           >
             <v-icon size="20">mdi-chevron-right</v-icon>
           </v-btn>
@@ -264,6 +320,8 @@ export default {
   data() {
     return {
       removeDialog: false,
+      updateDialog: false,
+      updatePayload: {},
       tab: 0,
       order: {
         step: 0,
@@ -283,30 +341,74 @@ export default {
   },
 
   fetch() {
-    this.$axios.$get('order/list/paginate').then((response) => {
-      this.orders = response.content.data
-      this.pager = response.content.pager
+    if (this.user.sectorId) this.filter.sectorId = this.user.sectorId
+
+    const payload = this.$convertToQueryString(this.filter)
+    this.$axios.$get('order/list/paginate?' + payload).then((response) => {
+      this.orders = response.data
+      this.pager = response.pager
     })
 
     this.$axios.$get(`sector/list`).then((response) => {
-      this.sectors = response.content
+      this.sectors = response
     })
   },
 
   head() {
     return {
-      title: 'Serviços',
+      title: 'Pedidos',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: 'Sector description',
+          content: 'Order description',
         },
       ],
     }
   },
 
+  computed: {
+    user() {
+      return this.$store.state.auth.user !== null
+        ? this.$store.state.auth.user
+        : {}
+    },
+  },
+
+  watch: {
+    'filter.page': {
+      deep: true,
+      handler() {
+        this.$fetch()
+      },
+    },
+  },
+
   methods: {
+    openUpdate(order, step) {
+      this.updatePayload = {
+        id: order.id,
+        title: order.title,
+        step,
+        stepString: ['Agendado', 'Em progresso', 'Feito'][step],
+      }
+
+      this.updateDialog = true
+    },
+
+    update() {
+      this.$axios
+        .$put('order/update-step', {
+          id: this.updatePayload.id,
+          step: this.updatePayload.step,
+        })
+        .then(() => {
+          this.updateDialog = false
+          this.$toast.success('Pedido atualizado com sucesso!')
+          this.$fetch()
+        })
+    },
+
     getColor(value) {
       if (value <= 30) {
         return 'error'

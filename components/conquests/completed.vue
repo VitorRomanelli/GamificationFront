@@ -1,5 +1,22 @@
 <template>
   <div>
+    <v-dialog v-model="dialog" max-width="650" persistent>
+      <ConquestsManage
+        :key="data.id"
+        :conquest-id="data.id"
+        @close="dialog = false"
+        @saved="$fetch(), (dialog = false)"
+      />
+    </v-dialog>
+
+    <v-dialog v-model="removeDialog" max-width="500">
+      <ConquestsRemove
+        :data="data"
+        @close="removeDialog = false"
+        @removed="remove(data.id)"
+      />
+    </v-dialog>
+
     <Header
       title="Conquistas completas"
       description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
@@ -20,6 +37,24 @@
       no-data-text="Nenhum dado encontrado"
       no-results-text="Nenhum dado encontrado"
     >
+      <template #[`item.computedType`]="{ item }">
+        {{ item.computedType }}
+        :
+        <span class="bold">
+          {{
+            item.type == 0 ? item.points + 'pts' : item.servicesConcludedCount
+          }}
+        </span>
+      </template>
+
+      <template #[`item.endDate`]="{ item }">
+        {{
+          item.endDate
+            ? $formatDateWithoutHour(item.endDate)
+            : 'Sem data limite'
+        }}
+      </template>
+
       <template #[`item.acts`]="{ item }">
         <v-btn text icon @click=";(data = item), (dialog = true)">
           <v-icon>mdi-pencil-outline</v-icon>
@@ -38,13 +73,17 @@
             {{ pager.totalItems }}
           </div>
           <div>
-            <v-btn icon :disabled="pager.currentPage == 1" @click="page--">
+            <v-btn
+              icon
+              :disabled="pager.currentPage == 1"
+              @click="filter.page--"
+            >
               <v-icon size="20">mdi-chevron-left</v-icon>
             </v-btn>
             <v-btn
               icon
               :disabled="pager.currentPage == pager.totalPages"
-              @click="page++"
+              @click="filter.page++"
             >
               <v-icon size="20">mdi-chevron-right</v-icon>
             </v-btn>
@@ -61,6 +100,9 @@ export default {
 
   data() {
     return {
+      data: {},
+      dialog: false,
+      removeDialog: false,
       items: [],
       pager: {
         currentPage: 1,
@@ -76,12 +118,12 @@ export default {
         {
           text: 'Tipo',
           align: 'start',
-          value: 'type',
+          value: 'computedType',
         },
         {
           text: 'Para',
           align: 'start',
-          value: 'to',
+          value: 'computedTo',
         },
         {
           text: 'Data limite',
@@ -99,10 +141,53 @@ export default {
         sortByText: 'Ordenar por',
       },
       filter: {
+        concluded: true,
         page: 1,
         pageSize: 10,
       },
     }
+  },
+
+  fetch() {
+    if (this.user.type !== 0) {
+      this.headers = this.headers.filter((x) => x.value !== 'acts')
+    }
+
+    this.filter.userId = this.user.id
+    const payload = this.$convertToQueryString(this.filter)
+    this.$axios
+      .$get(`conquest/list/user/paginate?${payload}`)
+      .then((response) => {
+        this.items = response.data
+        this.pager = response.pager
+      })
+  },
+
+  computed: {
+    user() {
+      return this.$store.state.auth.user !== null
+        ? this.$store.state.auth.user
+        : {}
+    },
+  },
+
+  watch: {
+    'filter.page': {
+      deep: true,
+      handler() {
+        this.$fetch()
+      },
+    },
+  },
+
+  methods: {
+    remove(id) {
+      this.$axios.$delete(`conquest/${id}`).then(() => {
+        this.removeDialog = false
+        this.$toast('Conquista removida com sucesso!')
+        this.$fetch()
+      })
+    },
   },
 }
 </script>

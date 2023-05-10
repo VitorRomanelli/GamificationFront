@@ -66,7 +66,6 @@
             label="Data limite"
             type="date"
             outlined
-            :rules="[(v) => !!v || 'Insira a data']"
           ></v-text-field>
         </v-col>
 
@@ -156,8 +155,10 @@ export default {
     if (this.conquestId) {
       this.editing = true
       this.$axios.$get(`conquest/${this.conquestId}`).then((response) => {
-        this.conquest = response.content
-        this.conquest.endDate = this.conquest.endDate.split('T')[0]
+        this.conquest = response
+        this.conquest.endDate = this.conquest.endDate
+          ? this.conquest.endDate.split('T')[0]
+          : ''
       })
     }
   },

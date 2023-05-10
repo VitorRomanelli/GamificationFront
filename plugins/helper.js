@@ -1,6 +1,30 @@
 import 'moment/locale/pt-br'
 
 export default ({ app }, inject) => {
+  inject('getLevel', (points) => {
+    if (points < 100) return 1
+
+    if (points >= 100 && points < 200) return 2
+
+    if (points >= 200 && points < 350) return 3
+
+    if (points >= 350 && points < 550) return 4
+
+    if (points >= 550 && points < 800) return 5
+
+    if (points >= 800 && points < 1100) return 6
+
+    if (points >= 1100 && points < 1450) return 7
+
+    if (points >= 1450 && points < 1850) return 8
+
+    if (points >= 1850 && points < 2300) return 9
+
+    if (points >= 2300 && points < 2800) return 10
+
+    return 10
+  })
+
   inject('convertToQueryString', (obj) => {
     const str = []
     for (const p in obj)

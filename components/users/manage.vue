@@ -160,12 +160,12 @@ export default {
     if (this.userId) {
       this.editing = true
       this.$axios.$get(`user/${this.userId}`).then((response) => {
-        this.user = response.content
+        this.user = response
       })
     }
 
     this.$axios.$get(`sector/list`).then((response) => {
-      this.sectors = response.content
+      this.sectors = response
     })
   },
 

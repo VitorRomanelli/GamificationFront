@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="dialog" max-width="650" persistent>
       <ConquestsManage
-        :key="data.id"
+        :key="dialogKey"
         :conquest-id="data.id"
         @close="dialog = false"
         @saved="$fetch(), (dialog = false)"
@@ -27,7 +27,12 @@
     </Header>
 
     <div class="d-flex justify-end mb-6">
-      <v-btn color="primary" depressed @click=";(data = {}), (dialog = true)">
+      <v-btn
+        v-if="user.type == 0"
+        color="primary"
+        depressed
+        @click=";(dialogKey = !dialogKey), (data = {}), (dialog = true)"
+      >
         Adicionar conquista
       </v-btn>
     </div>
@@ -43,12 +48,30 @@
       no-data-text="Nenhum dado encontrado"
       no-results-text="Nenhum dado encontrado"
     >
+      <template #[`item.computedType`]="{ item }">
+        {{ item.computedType }}
+        :
+        <span class="bold">
+          {{
+            item.type == 0 ? item.points + 'pts' : item.servicesConcludedCount
+          }}
+        </span>
+      </template>
+
       <template #[`item.endDate`]="{ item }">
-        {{ $formatDateWithoutHour(item.endDate) }}
+        {{
+          item.endDate
+            ? $formatDateWithoutHour(item.endDate)
+            : 'Sem data limite'
+        }}
       </template>
 
       <template #[`item.acts`]="{ item }">
-        <v-btn text icon @click=";(data = item), (dialog = true)">
+        <v-btn
+          text
+          icon
+          @click=";(dialogKey = !dialogKey), (data = item), (dialog = true)"
+        >
           <v-icon>mdi-pencil-outline</v-icon>
         </v-btn>
 
@@ -65,13 +88,17 @@
             {{ pager.totalItems }}
           </div>
           <div>
-            <v-btn icon :disabled="pager.currentPage == 1" @click="page--">
+            <v-btn
+              icon
+              :disabled="pager.currentPage == 1"
+              @click="filter.page--"
+            >
               <v-icon size="20">mdi-chevron-left</v-icon>
             </v-btn>
             <v-btn
               icon
               :disabled="pager.currentPage == pager.totalPages"
-              @click="page++"
+              @click="filter.page++"
             >
               <v-icon size="20">mdi-chevron-right</v-icon>
             </v-btn>
@@ -90,6 +117,7 @@ export default {
     return {
       data: {},
       dialog: false,
+      dialogKey: false,
       removeDialog: false,
       items: [],
       pager: {
@@ -137,12 +165,17 @@ export default {
   },
 
   fetch() {
+    if (this.user.type !== 0) {
+      this.headers = this.headers.filter((x) => x.value !== 'acts')
+    }
+
     this.filter.userId = this.user.id
     const payload = this.$convertToQueryString(this.filter)
     this.$axios
       .$get(`conquest/list/user/paginate?${payload}`)
       .then((response) => {
-        this.items = response.content.data
+        this.items = response.data
+        this.pager = response.pager
       })
   },
 
@@ -151,6 +184,15 @@ export default {
       return this.$store.state.auth.user !== null
         ? this.$store.state.auth.user
         : {}
+    },
+  },
+
+  watch: {
+    'filter.page': {
+      deep: true,
+      handler() {
+        this.$fetch()
+      },
     },
   },
 

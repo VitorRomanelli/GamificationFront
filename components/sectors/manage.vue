@@ -90,12 +90,12 @@ export default {
     if (this.id) {
       this.editing = true
       this.$axios.$get(`sector/${this.id}`).then((response) => {
-        this.sector = response.content
+        this.sector = response
       })
     }
 
     this.$axios.$get('user/list/supervisor').then((response) => {
-      this.users = response.content
+      this.users = response
     })
   },
 

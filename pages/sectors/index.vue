@@ -17,7 +17,7 @@
       </div>
       <SectorsManage
         :id="data.id"
-        :key="data.id"
+        :key="dialogKey"
         @close="dialog = false"
         @saved="$fetch(), (dialog = false)"
       />
@@ -40,8 +40,12 @@
       </v-col>
     </Header>
 
-    <div class="pa-4 d-flex justify-end">
-      <v-btn color="primary" depressed @click=";(data = {}), (dialog = true)">
+    <div v-if="user.type == 0" class="pa-4 d-flex justify-end">
+      <v-btn
+        color="primary"
+        depressed
+        @click=";(data = {}), (dialogKey = !dialogKey), (dialog = true)"
+      >
         Adicionar setor
       </v-btn>
     </div>
@@ -62,7 +66,9 @@
             <div class="d-flex align-center">
               <h1 class="t4 d-flex">{{ sector.name }}</h1>
               <v-spacer></v-spacer>
-              <span class="t5 d-flex accent--text mr-1">1000</span>
+              <span class="t5 d-flex accent--text mr-1">
+                {{ sector.points }}
+              </span>
               <span class="bold d-flex">pts</span>
             </div>
             <p class="bold mb-0">
@@ -73,13 +79,19 @@
               }}
             </p>
 
-            <div class="d-flex" style="margin-bottom: -17px">
+            <div
+              v-if="user.type == 0"
+              class="d-flex"
+              style="margin-bottom: -17px"
+            >
               <v-spacer></v-spacer>
               <v-btn
                 small
                 color="primary"
                 class="shadow2 mr-2"
-                @click=";(data = sector), (dialog = true)"
+                @click="
+                  ;(data = sector), (dialogKey = !dialogKey), (dialog = true)
+                "
               >
                 <v-icon small>mdi-pencil-outline</v-icon>
               </v-btn>
@@ -165,13 +177,14 @@ export default {
       },
       sectors: [],
       page: 1,
+      dialogKey: false,
     }
   },
 
   fetch() {
     const payload = this.$convertToQueryString(this.filter)
     this.$axios.$get(`sector/list/paginate?${payload}`).then((response) => {
-      this.sectors = response.content.data
+      this.sectors = response.data
     })
   },
 
@@ -186,6 +199,14 @@ export default {
         },
       ],
     }
+  },
+
+  computed: {
+    user() {
+      return this.$store.state.auth.user !== null
+        ? this.$store.state.auth.user
+        : {}
+    },
   },
 
   methods: {

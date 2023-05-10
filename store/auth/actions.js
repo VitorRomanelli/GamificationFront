@@ -4,15 +4,15 @@ export default {
     await this.$axios
       .$post('auth', { email, password })
       .then((response) => {
-        const user = response.content.user
-        const token = response.content.token
-        const expires = response.content.validTo
+        const user = response.user
+        const token = response.token
+        const expires = response.validTo
 
         commit('setUser', user)
         commit('setToken', token)
         commit('setExpires', expires)
 
-        this.$router.push('/users')
+        this.$router.push('/dash')
       })
       .catch(() => {})
   },
