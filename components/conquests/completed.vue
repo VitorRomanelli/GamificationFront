@@ -158,6 +158,7 @@ export default {
     this.$axios
       .$get(`conquest/list/user/paginate?${payload}`)
       .then((response) => {
+        console.log(response)
         this.items = response.data
         this.pager = response.pager
       })

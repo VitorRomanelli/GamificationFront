@@ -255,16 +255,16 @@
             <v-btn
               v-if="filter.page > 1"
               class="card-with-border"
-              @click="filter.page--"
+              @click="filter.page--, getUsers()"
             >
               Anterior
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn
-              v-if="filter.page <= pager.totalPages"
+              v-if="filter.page < pager.totalPages"
               :disabled="pager.totalPages == 1"
               class="card-with-border"
-              @click="filter.page++"
+              @click="filter.page++, getUsers()"
             >
               Próximo
             </v-btn>
@@ -451,18 +451,18 @@
 
           <div cols="12" class="d-flex">
             <v-btn
-              v-if="filter.page > 1"
+              v-if="filterSector.page > 1"
               class="card-with-border"
-              @click="filter.page--"
+              @click="filterSector.page--, getSectors()"
             >
               Anterior
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn
-              v-if="filter.page <= pager.totalPages"
-              :disabled="pager.totalPages == 1"
+              v-if="filterSector.page <= pagerSector.totalPages"
+              :disabled="pagerSector.totalPages == 1"
               class="card-with-border"
-              @click="filter.page++"
+              @click="filterSector.page++, getSectors()"
             >
               Próximo
             </v-btn>
@@ -479,9 +479,13 @@ export default {
 
   data() {
     return {
+      filterSector: {
+        page: 1,
+      },
       filter: {
         page: 1,
       },
+      pagerSector: {},
       env: process.env.API_KEY,
       items: [],
       sectors: [],
@@ -535,9 +539,10 @@ export default {
 
   methods: {
     getSectors() {
-      const payload = this.$convertToQueryString(this.filter)
+      const payload = this.$convertToQueryString(this.filterSector)
       this.$axios.$get(`sector/list/paginate?${payload}`).then((response) => {
         this.sectors = response.data
+        this.pagerSector = response.pager
       })
     },
 

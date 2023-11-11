@@ -28,7 +28,7 @@ export default {
     prefetchLinks: false,
   },
 
-  css: ['~/styles/global.scss'],
+  css: ['~/assets/styles/global.scss'],
 
   plugins: [
     '~/plugins/storage',

@@ -28,7 +28,7 @@
 
     <div class="d-flex justify-end mb-6">
       <v-btn
-        v-if="user.type == 0"
+        v-if="user.type < 2"
         color="primary"
         depressed
         @click=";(dialogKey = !dialogKey), (data = {}), (dialog = true)"
@@ -165,7 +165,7 @@ export default {
   },
 
   fetch() {
-    if (this.user.type !== 0) {
+    if (this.user.type > 1) {
       this.headers = this.headers.filter((x) => x.value !== 'acts')
     }
 

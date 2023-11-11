@@ -16,9 +16,10 @@
         contain
       ></v-img>
 
-      <h1 class="t1">Log in</h1>
-
-      <br />
+      <h1 class="t1">Bem Vindo</h1>
+      <p class="label">Entre com e-mail e senha para ter acesso ao sistema!</p>
+      <v-divider></v-divider>
+      <h3 class="t3 my-4">Log in</h3>
 
       <v-form ref="form">
         <v-text-field
@@ -55,7 +56,7 @@
         :loading="$nuxt.$loading ? $nuxt.$loading.loading : false"
         @click="login"
       >
-        Log in
+        Entrar
         <v-spacer></v-spacer>
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
