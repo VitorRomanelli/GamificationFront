@@ -2,7 +2,7 @@
   <div>
     <Header
       title="Conquistas"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Gerencie as metas e conquistas do sistema"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="timeline-amico.svg" max-height="380" contain></v-img>

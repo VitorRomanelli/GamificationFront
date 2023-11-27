@@ -179,14 +179,15 @@ export default {
 
     save() {
       if (this.$refs.form.validate()) {
-        const model = {
-          ...this.localUser,
-          picture: this.localUser.picture.split(',')[1],
-        }
-        this.$axios.$put('user', model).then((response) => {
-          this.$store.commit('auth/setUser', response)
-          this.$toast.success('Usuário atualizado com sucesso!')
-        })
+        this.$axios
+          .$put('user', {
+            ...this.localUser,
+            picture: this.localUser.picture.split(',')[1],
+          })
+          .then((response) => {
+            this.$store.commit('auth/setUser', response)
+            this.$toast.success('Usuário atualizado com sucesso!')
+          })
       }
     },
   },

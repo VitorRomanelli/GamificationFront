@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="dialog" max-width="800" persistent>
       <UsersManage
-        :key="data.id"
+        :key="dialogKey"
         :user-id="data.id"
         @close="dialog = false"
         @saved="$fetch(), (dialog = false)"
@@ -19,7 +19,7 @@
 
     <Header
       title="Usuários"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Cadastre, atualize e remove usuários do sistema, além disso, tenha visibilidade da quantidade total de usuários, da quantidade de usuários ativos e da quantidade de usuários inativos"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="office-work-amico.svg" max-height="350" contain></v-img>
@@ -52,7 +52,11 @@
         <span class="bold"> Usuários </span>
         <v-divider vertical class="ml-6"></v-divider>
         <v-spacer></v-spacer>
-        <v-btn depressed color="primary" @click=";(data = {}), (dialog = true)">
+        <v-btn
+          depressed
+          color="primary"
+          @click=";(data = {}), (dialogKey = !dialogKey), (dialog = true)"
+        >
           Adicionar
         </v-btn>
       </div>
@@ -83,7 +87,11 @@
         </template>
 
         <template #[`item.acts`]="{ item }">
-          <v-btn text icon @click=";(data = item), (dialog = true)">
+          <v-btn
+            text
+            icon
+            @click=";(data = item), (dialogKey = !dialogKey), (dialog = true)"
+          >
             <v-icon>mdi-pencil-outline</v-icon>
           </v-btn>
 
@@ -100,13 +108,17 @@
               {{ pager.totalItems }}
             </div>
             <div>
-              <v-btn icon :disabled="pager.currentPage == 1" @click="page--">
+              <v-btn
+                icon
+                :disabled="pager.currentPage == 1"
+                @click="page--, getUsers()"
+              >
                 <v-icon size="20">mdi-chevron-left</v-icon>
               </v-btn>
               <v-btn
                 icon
                 :disabled="pager.currentPage == pager.totalPages"
-                @click="page++"
+                @click="page++, getUsers()"
               >
                 <v-icon size="20">mdi-chevron-right</v-icon>
               </v-btn>
@@ -124,10 +136,12 @@ export default {
 
   data() {
     return {
+      dialogKey:false,
       removeDialog: false,
       data: {},
       dialog: false,
       total: 0,
+      page: 1,
       active: 0,
       inactive: 0,
       loading: false,
@@ -189,10 +203,7 @@ export default {
       this.inactive = response.inactive;
     })
 
-    this.$axios.$get(`user/list/paginate?${payload}`).then(response => {
-      this.items = response.data
-      this.pager = response.pager
-    })
+    this.getUsers()
   },
 
   head() {
@@ -209,6 +220,16 @@ export default {
   },
 
   methods: {
+    getUsers() {
+      this.filter.page = this.page
+      const payload = this.$convertToQueryString(this.filter);
+
+      this.$axios.$get(`user/list/paginate?${payload}`).then(response => {
+      this.items = response.data
+      this.pager = response.pager
+    })
+    },
+
     changeStatus(item) {
       const status = item.status === 1 ? 0 : 1
 

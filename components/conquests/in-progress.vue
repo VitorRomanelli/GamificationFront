@@ -19,7 +19,7 @@
 
     <Header
       title="Conquistas em andamento"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Visualize as conquistas em andamento"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="leader-rafiki.svg" max-height="380" contain></v-img>

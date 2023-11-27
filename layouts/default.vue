@@ -330,6 +330,10 @@ export default {
     },
   },
 
+  beforeDestroy() {
+    if (this.socketUserInstance) this.socketUserInstance.close()
+  },
+
   methods: {
     logout() {
       this.$store.dispatch('auth/logout')

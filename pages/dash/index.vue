@@ -2,7 +2,7 @@
   <div>
     <Header
       title="Dashboard"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Visualize os rankings de setores e de usuários do sistema"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="darkanalytics-bro.svg" max-height="380" contain></v-img>

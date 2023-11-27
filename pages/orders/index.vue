@@ -16,10 +16,7 @@
       />
     </v-dialog>
 
-    <Header
-      title="Pedidos"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
-    >
+    <Header title="Pedidos" description="Gerencie os serviços do sistema">
       <v-col class="d-flex justify-center align-center">
         <v-img
           src="customer-relationship-management-rafiki.svg"

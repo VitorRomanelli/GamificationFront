@@ -33,7 +33,7 @@
 
     <Header
       title="Setores"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Cadastre, atualize e remova os setores do sistema"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="team-work-bro.svg" max-height="400" contain></v-img>

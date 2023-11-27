@@ -19,7 +19,7 @@
 
     <Header
       title="Conquistas completas"
-      description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
+      description="Visualize as conquistas concluídas"
     >
       <v-col class="d-flex justify-center align-center">
         <v-img src="completed-bro.svg" max-height="380" contain></v-img>
