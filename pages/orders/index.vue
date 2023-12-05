@@ -73,7 +73,7 @@
             </div>
 
             <div style="width: 100%" class="d-flex flex-wrap">
-              <div>
+              <div style="max-width: 80%">
                 <div class="d-flex">
                   <div>
                     <h1 class="t4 mr-2">{{ ord.title }}</h1>
@@ -81,9 +81,9 @@
                   </div>
                 </div>
                 <div>
-                  <v-subheader class="pl-0 my-3 my-sm-0">
+                  <div class="pl-0 my-3 my-sm-0">
                     {{ ord.description }}
-                  </v-subheader>
+                  </div>
                   <div>
                     <v-chip color="secondary white--text" class="bold" label>
                       {{ ord.sector ? ord.sector.name : 'Sem registro' }}
@@ -342,7 +342,7 @@ export default {
 
     const payload = this.$convertToQueryString(this.filter)
     this.$axios.$get('order/list/paginate?' + payload).then((response) => {
-      this.orders = response.data
+      this.orders = response.data.filter((x) => x.step !== 2)
       this.pager = response.pager
     })
 

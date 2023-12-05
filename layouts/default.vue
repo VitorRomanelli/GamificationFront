@@ -53,17 +53,17 @@
                   <v-icon>mdi-bell-outline</v-icon>
                 </v-btn>
               </template>
-              <v-list nav style="overflow-y: auto; height: 300px !important">
+              <v-list
+                nav
+                style="overflow-y: auto; max-height: 300px !important"
+              >
                 <v-list-item
                   v-for="conq in conquests"
                   :key="conq.id"
                   link
                   class="d-block grey lighten-3 px-3 py-1"
                   to="/conquests"
-                  @click="
-                    notifs--,
-                      (conquests = conquests.filter((x) => x.id != conq.id))
-                  "
+                  @click="notifs--"
                 >
                   <p class="t5 mb-1">Parábens!</p>
                   <p v-if="conq.to == 0" class="label mb-1">
