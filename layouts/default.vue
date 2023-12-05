@@ -53,7 +53,7 @@
                   <v-icon>mdi-bell-outline</v-icon>
                 </v-btn>
               </template>
-              <v-list nav>
+              <v-list nav style="overflow-y: auto; height: 300px !important">
                 <v-list-item
                   v-for="conq in conquests"
                   :key="conq.id"
@@ -293,6 +293,9 @@ export default {
       const socketMessage = await JSON.parse(e.data)
       context.conquests = socketMessage.conquests
       context.notifs += socketMessage.conquests.length
+      context.conquests.forEach((x) =>
+        context.$toast('Parabéns, você recebeu a conquista ' + x.title)
+      )
     }
 
     if (this.user.sectorId) {
@@ -344,12 +347,12 @@ export default {
 
 <style scoped>
 .level-icon {
-  animation: pulse 1.5s ease-in-out;
+  animation: infinite pulse 1.5s ease-in-out;
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.5);
   }
 
   70% {

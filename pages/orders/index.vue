@@ -401,6 +401,11 @@ export default {
         })
         .then(() => {
           this.updateDialog = false
+
+          this.$axios.$get(`user/${this.user.id}`).then((response) => {
+            this.$store.dispatch('auth/setUser', response)
+          })
+
           this.$toast.success('Pedido atualizado com sucesso!')
           this.$fetch()
         })

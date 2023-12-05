@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+import { POSITION } from 'vue-toastification'
 require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
 
 export default {
@@ -52,6 +53,7 @@ export default {
   modules: ['@nuxtjs/axios', 'vue-toastification/nuxt'],
 
   toast: {
+    position: POSITION.TOP_LEFT,
     transition: 'Vue-Toastification__fade',
   },
 

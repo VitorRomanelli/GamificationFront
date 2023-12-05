@@ -20,4 +20,8 @@ export default {
   logout({ commit, state }) {
     commit('logout')
   },
+
+  setUser({ commit, dispatch }, user) {
+    commit('setUser', user)
+  },
 }
